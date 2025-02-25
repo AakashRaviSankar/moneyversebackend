@@ -6,7 +6,7 @@ import { User } from 'modules/users/user/user.entity';
 
 @Injectable()
 export class CooldownService {
-  private readonly COOLDOWN_TIME = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+  private readonly COOLDOWN_TIME = 2 * 60 * 60 * 1000; // 4 hours in milliseconds
 
   constructor(
     @InjectRepository(Cooldown)

@@ -34,7 +34,7 @@ export class UserService {
   ): Promise<User | undefined> {
     let users = await this.findAll(isAuth);
     const returnData = users.find(
-      (user) => user.username.toLocaleLowerCase() === email,
+      (user) => user.email.toLocaleLowerCase() === email,
     );
 
     return returnData;

@@ -86,6 +86,13 @@ export class AuthService {
   }
   async createUser(createUserDto: CreateUserDto) {
     try {
+      const isUserEmailExist = await this.usersService.findEmail(
+        createUserDto.email.toLocaleLowerCase(),
+      );
+
+      if (isUserEmailExist) {
+        throw new NotFoundException(MESSAGES.USER_EMAIL_ALREADY_EXIST);
+      }
       const isUserNameExist = await this.usersService.findOne(
         createUserDto.username.toLocaleLowerCase(),
       );
@@ -94,13 +101,6 @@ export class AuthService {
         throw new NotFoundException(MESSAGES.USER_ALREADY_EXIST);
       }
 
-      const isUserEmailExist = await this.usersService.findEmail(
-        createUserDto.email.toLocaleLowerCase(),
-      );
-
-      if (isUserEmailExist) {
-        throw new NotFoundException(MESSAGES.USER_EMAIL_ALREADY_EXIST);
-      }
       const { hash: hashedPassword, salt } = this.cryptoService.hashPassword(
         createUserDto.password,
       );
