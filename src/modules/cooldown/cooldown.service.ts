@@ -6,7 +6,7 @@ import { User } from 'modules/users/user/user.entity';
 
 @Injectable()
 export class CooldownService {
-  private readonly COOLDOWN_TIME = 2 * 60 * 1000; // 4 hours in milliseconds
+  private readonly COOLDOWN_TIME = 1 * 60 * 1000; // 4 hours in milliseconds
 
   constructor(
     @InjectRepository(Cooldown)
@@ -83,11 +83,9 @@ export class CooldownService {
       relations: ['user'],
     });
 
-    if (cooldown && cooldown.expireAt && cooldown.expireAt <= now) {
+    if (cooldown.expireAt && cooldown.expireAt <= now) {
       cooldown.numbers = [];
       cooldown.expireAt = null;
-    }
-    if (cooldown && cooldown.expireAt && cooldown.expireAt <= now) {
       await this.cooldownRepo.save(cooldown);
     }
     if (!cooldown) {
