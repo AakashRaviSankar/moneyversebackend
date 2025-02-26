@@ -83,13 +83,14 @@ export class CooldownService {
       relations: ['user'],
     });
 
+    if (!cooldown) {
+      return { numbers: [], cooldownEnds: undefined };
+    }
+
     if (cooldown.expireAt && cooldown.expireAt <= now) {
       cooldown.numbers = [];
       cooldown.expireAt = null;
       await this.cooldownRepo.save(cooldown);
-    }
-    if (!cooldown) {
-      return { numbers: [], cooldownEnds: undefined };
     }
 
     return cooldown.expireAt && cooldown.expireAt > now
