@@ -29,10 +29,6 @@ export class CooldownService {
     });
 
     // If cooldown exists and has expired, reset numbers and expireAt
-    if (cooldown && cooldown.expireAt && cooldown.expireAt <= now) {
-      cooldown.numbers = [];
-      cooldown.expireAt = null;
-    }
 
     if (!cooldown) {
       // Fetch user and ensure they exist
@@ -81,16 +77,23 @@ export class CooldownService {
     userId: string,
     task: string,
   ): Promise<{ numbers: number[]; cooldownEnds?: number }> {
+    const now = Date.now();
     const cooldown = await this.cooldownRepo.findOne({
       where: { user: { id: Number(userId) }, task },
       relations: ['user'],
     });
 
+    if (cooldown && cooldown.expireAt && cooldown.expireAt <= now) {
+      cooldown.numbers = [];
+      cooldown.expireAt = null;
+    }
+    if (cooldown && cooldown.expireAt && cooldown.expireAt <= now) {
+      await this.cooldownRepo.save(cooldown);
+    }
     if (!cooldown) {
       return { numbers: [], cooldownEnds: undefined };
     }
 
-    const now = Date.now();
     return cooldown.expireAt && cooldown.expireAt > now
       ? { numbers: cooldown.numbers, cooldownEnds: cooldown.expireAt }
       : { numbers: cooldown.numbers };
