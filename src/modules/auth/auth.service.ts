@@ -40,7 +40,9 @@ export class AuthService {
       const lowerUserName = username.toLocaleLowerCase();
       console.log(lowerUserName, 'lowerUserName');
       const user = await this.usersService.findOne(lowerUserName, true);
-      console.log(user, 'ssssssssssssssss');
+      if (!user) {
+        throw new UnauthorizedException(MESSAGES.USER_NOT_FOUND);
+      }
       const isPasswordValid = this.cryptoService.verifyPassword(
         pass,
         user?.password,
