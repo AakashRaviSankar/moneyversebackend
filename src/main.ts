@@ -38,7 +38,7 @@ async function bootstrap() {
 
   // Start the application
   const port = process.env.PORT || 3000; // Use environment variable for port
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 
 // Function to set up Swagger documentation
