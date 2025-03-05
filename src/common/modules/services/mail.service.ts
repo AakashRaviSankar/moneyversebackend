@@ -5,13 +5,18 @@ import * as ejs from 'ejs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
-const configuration = getDataFromJsonFile('src/config/config.json');
 export class MailService {
   private transporter;
   private mailcongigration;
 
   constructor() {
-    this.mailcongigration = configuration.mail;
+    this.mailcongigration = {
+      MAIL_HOST: 'mail.talentakeaways.com',
+      MAIL_PORT: '26',
+      MAIL_USER: 'mailto:itservices@talentakeaways.com',
+      MAIL_PASS: 'J7Er28sL%)5!9',
+      MAIL_FROM: 'mailto:infrats<no-reply@yourapp.com>',
+    };
     this.transporter = nodemailer.createTransport({
       host: this.mailcongigration.MAIL_HOST,
       port: this.mailcongigration.MAIL_PORT,

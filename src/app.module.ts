@@ -46,9 +46,9 @@ const environment = process.env.NODE_ENV || 'local'; // Default to 'local' if NO
     MenuCreatorModule,
     MenuModulesModule,
     MenuScreensModule,
-    LoggingModule,
+
     ScheduleModule.forRoot(),
-    TasksModule,
+
     SharedModule,
     WalletModule,
     TransactionModule,
