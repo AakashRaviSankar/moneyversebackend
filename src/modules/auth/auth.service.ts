@@ -35,6 +35,7 @@ export class AuthService {
     refreshToken?: string;
     roleId: number;
     userId: number;
+    mail: string;
   }> {
     try {
       const lowerUserName = username.toLocaleLowerCase();
@@ -67,8 +68,19 @@ export class AuthService {
           : null;
 
       return refreshToken
-        ? { accessToken, refreshToken, roleId: user.roleId, userId: user.id }
-        : { accessToken, roleId: user.roleId, userId: user.id };
+        ? {
+            accessToken,
+            refreshToken,
+            roleId: user.roleId,
+            userId: user.id,
+            mail: user.email,
+          }
+        : {
+            accessToken,
+            roleId: user.roleId,
+            userId: user.id,
+            mail: user.email,
+          };
     } catch (err) {
       throw err;
     }

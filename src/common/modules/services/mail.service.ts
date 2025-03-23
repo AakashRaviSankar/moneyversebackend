@@ -1,36 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { getDataFromJsonFile } from 'common/utils/fileUtils';
 import * as ejs from 'ejs';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
+@Injectable()
 export class MailService {
   private transporter;
-  private mailcongigration;
+  private mailConfiguration;
 
   constructor() {
-    this.mailcongigration = {
-      MAIL_HOST: 'mail.talentakeaways.com',
-      MAIL_PORT: '26',
-      MAIL_USER: 'mailto:itservices@talentakeaways.com',
-      MAIL_PASS: 'J7Er28sL%)5!9',
-      MAIL_FROM: 'mailto:infrats<no-reply@yourapp.com>',
+    this.mailConfiguration = {
+      MAIL_HOST: 'smtp.gmail.com',
+      MAIL_PORT: 587, // Gmail uses 587 for TLS
+      MAIL_USER: 'moneyverse412@gmail.com', // replace with your Gmail address
+      MAIL_PASS: 'lsnz spwo xvmk ducz', // replace with your Gmail App password
+      MAIL_FROM: 'moneyverse412@gmail.com', // replace with your Gmail address
     };
+
     this.transporter = nodemailer.createTransport({
-      host: this.mailcongigration.MAIL_HOST,
-      port: this.mailcongigration.MAIL_PORT,
-      secure: !!this.mailcongigration.IS_SECURE, // true for 465, false for other ports
+      host: this.mailConfiguration.MAIL_HOST,
+      port: this.mailConfiguration.MAIL_PORT,
+      secure: false, // TLS is used on port 587
       auth: {
-        user: this.mailcongigration.MAIL_USER,
-        pass: this.mailcongigration.MAIL_PASS,
+        user: this.mailConfiguration.MAIL_USER,
+        pass: this.mailConfiguration.MAIL_PASS, // your Gmail password or app password
+      },
+      tls: {
+        rejectUnauthorized: false, // important for Gmail's security
       },
     });
   }
+
   private async loadTemplate(
     templateName: string,
     variables: Record<string, any>,
   ): Promise<string> {
+    // Correcting the dynamic template path
     const templatePath = join(
       __dirname,
       '..',
@@ -38,12 +44,16 @@ export class MailService {
       'templates',
       `${templateName}.ejs`,
     );
-    const template = await readFile(
-      'src/common/templates/welcome.ejs',
-      'utf-8',
-    );
-    return ejs.render(template, variables);
+
+    try {
+      const template = await readFile(templatePath, 'utf-8');
+      return ejs.render(template, variables);
+    } catch (error) {
+      console.error('Error loading template: ', error);
+      throw new Error('Template not found or failed to load');
+    }
   }
+
   async sendMail(
     to: string,
     subject: string,
@@ -62,7 +72,7 @@ export class MailService {
     }
 
     const mailOptions = {
-      from: this.mailcongigration.MAIL_FROM,
+      from: this.mailConfiguration.MAIL_FROM,
       to,
       subject,
       text,

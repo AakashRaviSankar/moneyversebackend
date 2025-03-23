@@ -18,7 +18,7 @@ export class AppController {
   @Get('mailcheck')
   async asmailCheck(): Promise<any> {
     return await this.mailService.sendMail(
-      'virumab6@gmail.com',
+      'aakashsankar412@gmail.com',
       'subject new',
       null,
       true,

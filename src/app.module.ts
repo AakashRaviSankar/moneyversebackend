@@ -8,7 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import * as fs from 'fs';
 import * as path from 'path';
 import { AuthGuard } from './common/guards/auth.guards';
-import { getDataFromJsonFile } from './common/utils/fileUtils';
+
 import { SharedModule } from './common/modules/shared.module';
 import { dataSourceOptions } from './db/dataSource/typeorm.module';
 import { RoleModule } from 'modules/RBAC/role/role.module';
@@ -17,9 +17,9 @@ import { MenuCreatorModule } from './modules/RBAC/menu-creator/menu-creator.modu
 import { MenuModulesModule } from './modules/RBAC/menu-creator/menu-modules.module';
 import { MenuScreensModule } from './modules/RBAC/menu-creator/menu-screens.module';
 import { ConfigModule } from '@nestjs/config';
-import { LoggingModule } from 'common/logging/logging.module';
+
 import { ScheduleModule } from '@nestjs/schedule';
-import { TasksModule } from 'common/tasks/tasks.module';
+
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { WalletModule } from 'modules/wallet/wallet.module';
 import { TransactionModule } from 'modules/transaction/transaction.module';
@@ -46,9 +46,7 @@ const environment = process.env.NODE_ENV || 'local'; // Default to 'local' if NO
     MenuCreatorModule,
     MenuModulesModule,
     MenuScreensModule,
-
     ScheduleModule.forRoot(),
-
     SharedModule,
     WalletModule,
     TransactionModule,
