@@ -45,10 +45,14 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    user.isActive = false;
+    user.isActive = user.isActive ? false : true;
     await this.userRepository.save(user);
 
-    return { message: 'User deactivated successfully' };
+    return {
+      message: user.isActive
+        ? 'User deactivated successfully'
+        : 'User activated successfully',
+    };
   }
 
   async findOne(
@@ -58,8 +62,9 @@ export class UserService {
     let users = await this.findAll(isAuth);
     const returnData = users.find(
       (user) =>
-        user.username.toLocaleLowerCase() === username ||
-        user.email.toLocaleLowerCase() === username,
+        (user.username.toLocaleLowerCase() === username ||
+          user.email.toLocaleLowerCase() === username) &&
+        user.isActive,
     );
 
     return returnData;
