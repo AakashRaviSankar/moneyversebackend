@@ -30,6 +30,6 @@ export class AppController {
   @Public()
   @Get('deviceversion')
   async deviceVersion(): Promise<any> {
-    return { version: '1.0.0' };
+    return { version: '1.1.1', url: 'www.google.com' };
   }
 }
