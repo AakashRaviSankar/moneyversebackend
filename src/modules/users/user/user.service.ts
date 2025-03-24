@@ -4,17 +4,20 @@ import { Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { promises } from 'dns';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Wallet } from 'modules/wallet/entities/wallet.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Wallet)
+    private walletRepository: Repository<Wallet>,
   ) {}
   async findAll(isAuth: boolean = false): Promise<any[]> {
     const users = await this.userRepository.find({
       select: isAuth
-        ? ['id', 'username', 'email', 'password', 'salt', 'roleId']
+        ? ['id', 'username', 'email', 'password', 'salt', 'roleId', 'isActive']
         : ['id', 'username', 'email', 'isActive'],
       relations: ['wallet'],
     });
@@ -26,18 +29,28 @@ export class UserService {
     }));
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['wallet'],
+    });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    Object.assign(user, updateUserDto);
+    // Update user fields if provided
+    if (updateUserDto.username) user.username = updateUserDto.username;
+    if (updateUserDto.email) user.email = updateUserDto.email;
 
-    return this.userRepository.save(user);
+    // Update wallet if balance is provided
+    if (updateUserDto.balance !== undefined && user.wallet) {
+      user.wallet.balance = updateUserDto.balance;
+      await this.walletRepository.save(user.wallet); // Save wallet changes
+    }
+
+    return this.userRepository.save(user); // Save user changes
   }
-
   async softDeleteUser(id: number): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({ where: { id } });
 
@@ -49,7 +62,7 @@ export class UserService {
     await this.userRepository.save(user);
 
     return {
-      message: user.isActive
+      message: !user.isActive
         ? 'User deactivated successfully'
         : 'User activated successfully',
     };
