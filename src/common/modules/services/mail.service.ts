@@ -59,19 +59,21 @@ export class MailService {
     subject: string,
     text: string,
     isTemplate: boolean = false,
+    complaint?: string,
     templateName?: string,
     variables?: Record<string, any>,
     cc?: string[],
     bcc?: string[],
   ): Promise<any> {
-    let html = '';
+    let html =
+      "<p>Dear Customer,</p><p>Thank you for reaching out to us. We want to let you know that we have received your complaint, and we truly appreciate you bringing this matter to our attention.</p><p>Our team is currently reviewing your concern, and we will get in touch with you within the next 48 hours to provide further assistance.</p><p>We appreciate your patience and understanding in this matter.</p><p>If you have any urgent concerns in the meantime, please don't hesitate to contact us.</p><p>Best regards, <br>Aakash R</p>";
 
     // Check if isTemplate is true and templateName is provided
     if (isTemplate && templateName && variables) {
       html = await this.loadTemplate(templateName, variables);
     }
 
-    const mailOptions = {
+    const mailOptions1 = {
       from: this.mailConfiguration.MAIL_FROM,
       to,
       subject,
@@ -80,11 +82,21 @@ export class MailService {
       cc,
       bcc,
     };
+    const mailOptions2 = {
+      from: this.mailConfiguration.MAIL_FROM,
+      to: this.mailConfiguration.MAIL_FROM,
+      subject: 'New Complaint Received',
+      text: 'New Complaint Received',
+      html: `<p>${complaint}</p>`,
+      cc,
+      bcc,
+    };
 
     try {
-      const info = await this.transporter.sendMail(mailOptions);
+      const info = await this.transporter.sendMail(mailOptions1);
+      const info2 = await this.transporter.sendMail(mailOptions2);
       console.log('Message sent: %s', info.messageId);
-      return info;
+      return { info, info2 };
     } catch (error) {
       console.error('Error sending email: ', error);
       throw error;

@@ -1,7 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MailService } from 'common/modules/services/mail.service';
 import { Public } from 'common/decorators/public.decorator';
+import { ComplaintDto } from 'complaint.dto';
 
 @Controller()
 export class AppController {
@@ -15,18 +16,20 @@ export class AppController {
     return 'Hello World!';
   }
   @Public()
-  @Get('mailcheck')
-  async asmailCheck(): Promise<any> {
+  @Post('complaint')
+  async asmailCheck(@Body() body: ComplaintDto): Promise<any> {
     return await this.mailService.sendMail(
-      'aakashsankar412@gmail.com',
-      'subject new',
+      body.email,
+      'Thank You for Contacting Us',
       null,
-      true,
-      'welcome',
-      {
-        name: 'Viruma',
-        platform: 'React',
-      },
+      false,
+      body.complaint,
     );
+  }
+
+  @Public()
+  @Get('deviceversion')
+  async deviceVersion(): Promise<any> {
+    return { version: '1.0.0' };
   }
 }

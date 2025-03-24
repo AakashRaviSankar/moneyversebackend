@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { promises } from 'dns';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -10,13 +11,46 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-  async findAll(isAuth: boolean = false): Promise<User[]> {
-    return this.userRepository.find({
+  async findAll(isAuth: boolean = false): Promise<any[]> {
+    const users = await this.userRepository.find({
       select: isAuth
         ? ['id', 'username', 'email', 'password', 'salt', 'roleId']
-        : ['id', 'username', 'email'],
+        : ['id', 'username', 'email', 'isActive'],
+      relations: ['wallet'],
     });
+
+    return users.map((user) => ({
+      ...user,
+      wallet: user.wallet ? user.wallet.balance : 0,
+      // Extract only balance
+    }));
   }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    Object.assign(user, updateUserDto);
+
+    return this.userRepository.save(user);
+  }
+
+  async softDeleteUser(id: number): Promise<{ message: string }> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.isActive = false;
+    await this.userRepository.save(user);
+
+    return { message: 'User deactivated successfully' };
+  }
+
   async findOne(
     username: string,
     isAuth: boolean = false,
