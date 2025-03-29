@@ -44,8 +44,10 @@ export class User {
 
   // One user has one wallet
   @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
-  @JoinColumn({ name: 'walletId' })
   wallet: Wallet;
+
+  @Column({ type: 'int', unique: true, nullable: true }) // Prevents duplicate wallet IDs
+  walletId: number | null;
 
   // One user has many transactions
   @OneToMany(() => Transaction, (transaction) => transaction.user)

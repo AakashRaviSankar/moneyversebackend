@@ -22,11 +22,11 @@ export class Wallet {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @OneToOne(() => User, { eager: true }) // Automatically fetches user
+  @OneToOne(() => User, (user) => user.wallet, { onDelete: 'CASCADE' }) // Bi-directional relation
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
+  @Column({ unique: true }) // Ensures uniqueness in the DB as well
   userId: number;
 
   @CreateDateColumn({ type: 'timestamp' })

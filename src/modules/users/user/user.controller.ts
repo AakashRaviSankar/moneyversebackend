@@ -6,7 +6,7 @@ import { Public } from 'common/decorators/public.decorator';
 import { MailService } from 'common/modules/services/mail.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('users')
+@Controller('v1/users')
 @Public()
 @ApiTags('Users')
 export class UserController {

@@ -1,10 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { MenuModulesService } from './menu-modules.service';
 import { CreateMenuModuleDto } from './dto/create-menu-module.dto';
 import { UpdateMenuModuleDto } from './dto/update-menu-module.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('menu-modules')
+@Controller('v1/menu-modules')
 @ApiTags('RBAC-Menu Module')
 export class MenuModulesController {
   constructor(private readonly menuModulesService: MenuModulesService) {}
@@ -15,7 +23,10 @@ export class MenuModulesController {
   }
 
   @Post('update/:menuModuleId')
-  async update(@Param('menuModuleId') menuModuleId: number, @Body() updateMenuModuleDto: UpdateMenuModuleDto) {
+  async update(
+    @Param('menuModuleId') menuModuleId: number,
+    @Body() updateMenuModuleDto: UpdateMenuModuleDto,
+  ) {
     return this.menuModulesService.update(menuModuleId, updateMenuModuleDto);
   }
 

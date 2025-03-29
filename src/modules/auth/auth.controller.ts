@@ -11,13 +11,16 @@ import {
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { SignInDto } from './dto/sign-in.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BaseController } from 'base.controller';
 import { MESSAGES } from 'constants/messages.constants';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 
-@Controller('auth')
+@Controller('v1/auth')
 @ApiTags('Auth')
 export class AuthController extends BaseController {
   constructor(private authService: AuthService) {
@@ -42,17 +45,35 @@ export class AuthController extends BaseController {
   }
 
   @Public()
-  @Post('refresh-token')
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    const data = await this.authService.refreshToken(
-      refreshTokenDto.refreshToken,
-    );
-    return this.formatSuccessResponse(data, HttpStatus.CREATED);
+  @Post('forgot-password')
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<object> {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
   }
+
+  // Step 2: Verify OTP
   @Public()
-  @Post('create-user')
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.authService.createUser(createUserDto);
+  @Post('verify-otp')
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto): Promise<object> {
+    return this.authService.verifyOtp(
+      verifyOtpDto.email,
+      +verifyOtpDto.otp,
+      verifyOtpDto.token,
+    );
+  }
+
+  // Step 3: Reset Password
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<object> {
+    return this.authService.resetPassword(
+      resetPasswordDto.email,
+      resetPasswordDto.newPassword,
+      resetPasswordDto.token,
+    );
   }
 
   @Get('profile')

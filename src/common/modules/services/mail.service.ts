@@ -102,4 +102,23 @@ export class MailService {
       throw error;
     }
   }
+  async sendMail2(to: string, name: string, resetUrl: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        to,
+        from: process.env.MAIL_FROM || 'noreply@example.com', // Set your sender email
+        subject: 'Reset Password',
+        html: `
+          <p>Hello ${name},</p>
+          <p>You requested to reset your password. Click the link below:</p>
+          <p>${resetUrl}</p>
+          <p>If you did not request this, please ignore this email.</p>
+        `,
+      });
+      console.log(`Email sent successfully to ${to}`);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw new Error('Email sending failed');
+    }
+  }
 }

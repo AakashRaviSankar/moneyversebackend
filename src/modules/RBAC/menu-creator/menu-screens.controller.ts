@@ -4,7 +4,7 @@ import { CreateMenuScreenDto } from './dto/create-menu-screen.dto';
 import { UpdateMenuScreenDto } from './dto/update-menu-screen.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('menu-screens')
+@Controller('v1/menu-screens')
 @ApiTags('RBAC-Menu Screen')
 export class MenuScreensController {
   constructor(private readonly menuScreensService: MenuScreensService) {}
@@ -15,7 +15,10 @@ export class MenuScreensController {
   }
 
   @Post(':menuScreenId')
-  async update(@Param('menuScreenId') menuScreenId: number, @Body() updateMenuScreenDto: UpdateMenuScreenDto) {
+  async update(
+    @Param('menuScreenId') menuScreenId: number,
+    @Body() updateMenuScreenDto: UpdateMenuScreenDto,
+  ) {
     return this.menuScreensService.update(menuScreenId, updateMenuScreenDto);
   }
 

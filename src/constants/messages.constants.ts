@@ -5,4 +5,9 @@ export const MESSAGES = {
   USER_ALREADY_EXIST: 'User already exist, please try with another username',
   USER_EMAIL_ALREADY_EXIST: 'User already exist, please try with another email',
   USER_NOT_FOUND: 'User not found, please create an account',
+  RESET_LINK_SENT: 'Reset link sent to your email',
+  PASSWORD_RESET_SUCCESS: 'Password reset successfully',
+  INVALID_OTP: 'Invalid OTP',
+  EXPIRED_OR_INVALID_OTP: 'Expired or invalid OTP',
+  EXPIRED_OR_INVALID_TOKEN: 'Expired or invalid token',
 };

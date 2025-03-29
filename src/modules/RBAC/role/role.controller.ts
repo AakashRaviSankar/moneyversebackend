@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Param, Body, ParseIntPipe, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Param,
+  Body,
+  ParseIntPipe,
+  Delete,
+} from '@nestjs/common';
 import { RoleService } from './role.service';
 import { Role } from './entities/role.entity';
 import { RolePermission } from './entities/role-permission.entity';
@@ -6,10 +15,10 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleWithPermissionsDto } from './dto/update-role-with-permissions.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('roles')
+@Controller('v1/roles')
 @ApiTags('Screen Action')
 export class RoleController {
-  constructor(private readonly roleService: RoleService) { }
+  constructor(private readonly roleService: RoleService) {}
 
   @Get()
   async getAllRoles(): Promise<Role[]> {
@@ -18,7 +27,7 @@ export class RoleController {
 
   @Post()
   async createRoleWithPermissions(
-    @Body() createRoleDto: CreateRoleDto
+    @Body() createRoleDto: CreateRoleDto,
   ): Promise<Role> {
     return this.roleService.createRoleWithPermissions(createRoleDto);
   }
@@ -26,7 +35,7 @@ export class RoleController {
   @Post(':id')
   async updateRoleWithPermissions(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateRoleDto: UpdateRoleWithPermissionsDto
+    @Body() updateRoleDto: UpdateRoleWithPermissionsDto,
   ): Promise<Role> {
     return this.roleService.updateRoleWithPermissions(id, updateRoleDto);
   }
@@ -43,9 +52,8 @@ export class RoleController {
 
   @Post('activeStatus')
   async updateRoleStatus(
-    @Body() body: { id: number; action: 'enable' | 'disable' }
+    @Body() body: { id: number; action: 'enable' | 'disable' },
   ): Promise<{ message: string }> {
     return this.roleService.setRoleActiveStatus(body);
   }
-
 }

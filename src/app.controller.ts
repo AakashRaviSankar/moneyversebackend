@@ -16,7 +16,7 @@ export class AppController {
     return 'Hello World!';
   }
   @Public()
-  @Post('complaint')
+  @Post('v1/complaint')
   async asmailCheck(@Body() body: ComplaintDto): Promise<any> {
     return await this.mailService.sendMail(
       body.email,
@@ -30,6 +30,6 @@ export class AppController {
   @Public()
   @Get('deviceversion')
   async deviceVersion(): Promise<any> {
-    return { version: '1.1.1', url: 'https://moneyverse-one.vercel.app' };
+    return { version: '1.1.2', url: 'https://moneyverse-one.vercel.app' };
   }
 }

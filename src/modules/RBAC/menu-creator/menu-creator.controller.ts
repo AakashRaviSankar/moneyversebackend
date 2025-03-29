@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Delete, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { MenuCreatorService } from './menu-creator.service';
 import { CreateUpdateMenuDto } from './dto/create-update-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -6,10 +15,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { Module as MenuModule } from './entities/module.entity';
 import { BaseController } from '../../../base.controller';
 
-@Controller('menu-creator')
+@Controller('v1/menu-creator')
 @ApiTags('RBAC-Menu Control')
 export class MenuCreatorController extends BaseController {
-
   constructor(private readonly menuCreatorService: MenuCreatorService) {
     super();
   }

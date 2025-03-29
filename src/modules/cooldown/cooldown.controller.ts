@@ -3,7 +3,7 @@ import { CooldownService } from './cooldown.service';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('transactions')
-@Controller('cooldown')
+@Controller('v1/cooldown')
 export class CooldownController {
   constructor(private readonly cooldownService: CooldownService) {}
 

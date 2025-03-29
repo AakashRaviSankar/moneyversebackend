@@ -5,7 +5,7 @@ import { TransactionStatus } from './entities/transaction.entity';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('transactions')
-@Controller('transactions')
+@Controller('v1/transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 

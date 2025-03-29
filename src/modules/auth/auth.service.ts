@@ -14,6 +14,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { CryptoService } from 'common/modules/services/crypt.service';
 import { Wallet } from 'modules/wallet/entities/wallet.entity';
+import { MailService } from 'common/modules/services/mail.service';
+import { Cache } from 'cache-manager';
+import { Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import * as crypto from 'crypto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,6 +30,8 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private readonly cryptoService: CryptoService,
+    private readonly mailerService: MailService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async signIn(
@@ -98,6 +105,7 @@ export class AuthService {
       throw new UnauthorizedException(MESSAGES.INVALID_TOKEN);
     }
   }
+
   async createUser(createUserDto: CreateUserDto) {
     try {
       const isUserEmailExist = await this.usersService.findEmail(
@@ -151,6 +159,107 @@ export class AuthService {
       return signInRes;
     } catch (err) {
       throw err;
+    }
+  }
+
+  // Forgot Password: Generate & Send OTP
+
+  async forgotPassword(email: string): Promise<object> {
+    const user = await this.usersService.findEmail(email.toLowerCase());
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
+    }
+
+    // Generate a secure 6-digit OTP
+    const otp = crypto.randomInt(100000, 999999);
+
+    // Generate JWT token with OTP
+    const otpToken = this.jwtService.sign(
+      { userId: user.id, otp },
+      { expiresIn: '5m' }, // Token expires in 5 minutes
+    );
+
+    console.log(`DEBUG: OTP generated for user ${user.id}`);
+    console.log(`DEBUG: OTP: ${otp}`);
+    console.log(`DEBUG: OTP Token: ${otpToken}`);
+
+    // Send OTP via email (Without exposing token in the message)
+    await this.mailerService.sendMail2(
+      user.email,
+      user.username,
+      `Your OTP for password reset is: ${otp} , otpToken: ${otpToken}`,
+    );
+
+    return { message: 'OTP sent to your email', success: true };
+  }
+
+  // Verify OTP
+  async verifyOtp(email: string, otp: number, token: string): Promise<object> {
+    const user = await this.usersService.findEmail(email.toLowerCase());
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
+    }
+
+    try {
+      // Decode JWT
+      const decoded = this.jwtService.verify(token);
+
+      // Validate OTP
+      if (decoded.userId !== user.id || decoded.otp !== otp) {
+        throw new UnauthorizedException(MESSAGES.INVALID_OTP);
+      }
+
+      // Generate a new JWT to authorize password reset (valid for 10 min)
+      const resetToken = this.jwtService.sign(
+        { userId: user.id, verified: true },
+        { expiresIn: '10m' },
+      );
+
+      console.log(`DEBUG: OTP verified for user ${user.id}`);
+
+      return { token: resetToken, success: true }; // Send this token back to the user for password reset
+    } catch (error) {
+      console.error('JWT Verification Error:', error);
+      throw new UnauthorizedException(MESSAGES.EXPIRED_OR_INVALID_OTP);
+    }
+  }
+
+  // Reset Password
+  async resetPassword(
+    email: string,
+    newPassword: string,
+    resetToken: string,
+  ): Promise<object> {
+    const user = await this.usersService.findEmail(email.toLowerCase());
+    if (!user) {
+      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
+    }
+
+    try {
+      // Verify JWT token for password reset
+      const decoded = this.jwtService.verify(resetToken);
+      console.log(decoded);
+
+      // Ensure the user is authorized for password reset
+      if (decoded.userId !== user.id || !decoded.verified) {
+        throw new UnauthorizedException(MESSAGES.UNAUTHORIZED_ACCESS);
+      }
+
+      // Securely hash the new password
+      const { hash: hashedPassword, salt } =
+        this.cryptoService.hashPassword(newPassword);
+
+      // Update the password in the database
+      user.password = hashedPassword;
+      user.salt = salt;
+      await this.userRepository.save(user);
+
+      console.log(`DEBUG: Password reset successful for user ${user.id}`);
+
+      return { success: true, message: 'Password reset successfully' };
+    } catch (error) {
+      console.error('JWT Verification Error:', error);
+      throw new UnauthorizedException(MESSAGES.EXPIRED_OR_INVALID_TOKEN);
     }
   }
 }

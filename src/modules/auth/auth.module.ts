@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserModule } from '../users/user/user.module';
@@ -8,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/user/user.entity';
 import { WalletModule } from 'modules/wallet/wallet.module';
 import { Wallet } from 'modules/wallet/entities/wallet.entity';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -15,6 +17,12 @@ import { Wallet } from 'modules/wallet/entities/wallet.entity';
     TypeOrmModule.forFeature([Wallet]),
     UserModule,
     WalletModule,
+    CacheModule.register({
+      store: redisStore,
+      host: 'localhost',
+      port: 6379,
+      ttl: 300, // 5 minutes
+    }),
     JwtModule.registerAsync({
       global: true,
       useFactory: async (configService: ConfigService) => ({
