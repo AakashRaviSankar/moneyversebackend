@@ -43,6 +43,19 @@ export class AuthController extends BaseController {
       MESSAGES.LOGGED_IN_SUCCESSFULLY,
     );
   }
+  @Public()
+  @Post('create-user')
+  async createUser(@Body() createUserDto: CreateUserDto) {
+    return this.authService.createUser(createUserDto);
+  }
+  @Public()
+  @Post('refresh-token')
+  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    const data = await this.authService.refreshToken(
+      refreshTokenDto.refreshToken,
+    );
+    return this.formatSuccessResponse(data, HttpStatus.CREATED);
+  }
 
   @Public()
   @Post('forgot-password')
