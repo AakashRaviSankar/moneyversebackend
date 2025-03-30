@@ -30,6 +30,6 @@ export class AppController {
   @Public()
   @Get('deviceversion')
   async deviceVersion(): Promise<any> {
-    return { version: '1.1.2', url: 'https://moneyverse-one.vercel.app' };
+    return { version: '1.1.3', url: 'https://moneyverse-one.vercel.app' };
   }
 }
