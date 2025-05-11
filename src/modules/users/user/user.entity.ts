@@ -42,12 +42,11 @@ export class User {
   @Column({ type: 'int' })
   roleId: number;
 
-  // One user has one wallet
   @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
   wallet: Wallet;
 
-  @Column({ type: 'int', unique: true, nullable: true }) // Prevents duplicate wallet IDs
-  walletId: number | null;
+  @Column({ type: 'varchar', length: 255 })
+  deviceId: string;
 
   // One user has many transactions
   @OneToMany(() => Transaction, (transaction) => transaction.user)

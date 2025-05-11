@@ -5,13 +5,11 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
-  Unique,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ schema: 'finance', name: 'wallets' })
-@Unique(['userId']) // Ensures one wallet per user
 export class Wallet {
   @PrimaryGeneratedColumn()
   id: number;
@@ -22,12 +20,12 @@ export class Wallet {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @OneToOne(() => User, (user) => user.wallet, { onDelete: 'CASCADE' }) // Bi-directional relation
+  @OneToOne(() => User, (user) => user.wallet, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column({ unique: true }) // Ensures uniqueness in the DB as well
-  userId: number;
+  @Column()
+  userId: number; // Already treated as unique because of OneToOne + JoinColumn
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

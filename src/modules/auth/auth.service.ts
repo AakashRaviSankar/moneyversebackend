@@ -37,6 +37,7 @@ export class AuthService {
   async signIn(
     username: string,
     pass: string,
+    deviceId: string,
   ): Promise<{
     accessToken: string;
     refreshToken?: string;
@@ -46,20 +47,29 @@ export class AuthService {
   }> {
     try {
       const lowerUserName = username.toLocaleLowerCase();
-      console.log(lowerUserName, 'lowerUserName');
       const user = await this.usersService.findOne(lowerUserName, true);
+
       if (!user) {
         throw new UnauthorizedException(MESSAGES.USER_NOT_FOUND);
       }
+
       const isPasswordValid = this.cryptoService.verifyPassword(
         pass,
-        user?.password,
-        user?.salt,
+        user.password,
+        user.salt,
       );
 
       if (!isPasswordValid) {
         throw new UnauthorizedException(MESSAGES.UNAUTHORIZED_ACCESS);
       }
+
+      console.log(user, 'zzzz');
+
+      // ✅ Validate deviceId
+      if (user.deviceId && user.deviceId !== deviceId) {
+        throw new UnauthorizedException(MESSAGES.UNAUTHORIZED_DEVICE);
+      }
+
       const payload = { userId: user.id, username: user.username };
 
       const accessToken = await this.jwtService.signAsync(payload);
@@ -122,6 +132,15 @@ export class AuthService {
       if (isUserNameExist) {
         throw new NotFoundException(MESSAGES.USER_ALREADY_EXIST);
       }
+      if (createUserDto.deviceId) {
+        const isDeviceIdExist = await this.userRepository.findOne({
+          where: { deviceId: createUserDto.deviceId },
+        });
+
+        if (isDeviceIdExist) {
+          throw new NotFoundException(MESSAGES.DEVICE_ID_ALREADY_REGISTERED);
+        }
+      }
 
       const { hash: hashedPassword, salt } = this.cryptoService.hashPassword(
         createUserDto.password,
@@ -154,6 +173,7 @@ export class AuthService {
       const signInRes = await this.signIn(
         createdUser.username,
         createUserDto.password,
+        createUserDto.deviceId,
       );
 
       return signInRes;

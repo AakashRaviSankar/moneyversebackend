@@ -10,7 +10,7 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  @ApiProperty({ description: 'email' })
+  @ApiProperty({ description: 'email', required: false })
   @IsEmail()
   @IsOptional()
   email: string;
@@ -18,4 +18,8 @@ export class CreateUserDto {
   @ApiProperty({ description: 'roleId' })
   @IsInt()
   roleId: number;
+
+  @ApiProperty({ description: 'device ID of the user device' })
+  @IsString()
+  deviceId: string;
 }

@@ -17,8 +17,17 @@ export class UserService {
   async findAll(isAuth: boolean = false): Promise<any[]> {
     const users = await this.userRepository.find({
       select: isAuth
-        ? ['id', 'username', 'email', 'password', 'salt', 'roleId', 'isActive']
-        : ['id', 'username', 'email', 'isActive'],
+        ? [
+            'id',
+            'username',
+            'email',
+            'password',
+            'salt',
+            'roleId',
+            'isActive',
+            'deviceId',
+          ]
+        : ['id', 'username', 'email', 'isActive', 'deviceId'],
       relations: ['wallet'],
     });
 
@@ -73,6 +82,7 @@ export class UserService {
     isAuth: boolean = false,
   ): Promise<User | undefined> {
     let users = await this.findAll(isAuth);
+
     const returnData = users.find(
       (user) =>
         (user.username.toLocaleLowerCase() === username ||

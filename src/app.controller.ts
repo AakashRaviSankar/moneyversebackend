@@ -32,4 +32,9 @@ export class AppController {
   async deviceVersion(): Promise<any> {
     return { version: '1.1.3', url: 'https://moneyverse-one.vercel.app' };
   }
+  @Public()
+  @Get('apinow')
+  async apinow(): Promise<any> {
+    return { url: 'https:/moneyversebackend-production.up.railway.app' };
+  }
 }

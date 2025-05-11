@@ -35,6 +35,7 @@ export class AuthController extends BaseController {
     const data = await this.authService.signIn(
       signInDto.username,
       signInDto.password,
+      signInDto.deviceId,
     );
     console.log(data, 'hug');
     return this.formatSuccessResponse(

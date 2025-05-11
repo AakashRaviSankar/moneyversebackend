@@ -10,4 +10,8 @@ export const MESSAGES = {
   INVALID_OTP: 'Invalid OTP',
   EXPIRED_OR_INVALID_OTP: 'Expired or invalid OTP',
   EXPIRED_OR_INVALID_TOKEN: 'Expired or invalid token',
+  DEVICE_ID_ALREADY_REGISTERED:
+    'A user is not allowed to created multiple accounts, for furthur assistance contact admin : moneyverse412@gmail.com',
+  UNAUTHORIZED_DEVICE:
+    'Account created device and login device should be same, for furthur assistance contact admin : moneyverse412@gmail.com',
 };
